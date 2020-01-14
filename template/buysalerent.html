@@ -1,0 +1,162 @@
+﻿{% include 'header.html' %}
+<!-- banner -->
+{% load staticfiles %}
+<style>
+    .cimg{
+    height:200px;
+    }
+
+</style>
+<script>
+  $(document).ready(function(){
+
+    });
+
+
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Buy, Sale & Rent</span>
+    <h2>Buy, Sale & Rent</h2>
+</div>
+</div>
+<!-- banner -->
+
+
+<div class="container">
+<div class="properties-listing spacer">
+
+<div class="row">
+<div class="col-lg-3 col-sm-4 ">
+
+  <div class="search-form"><h4><span class="glyphicon glyphicon-search"></span> Search for</h4>
+   <form action="{% url 'query-search' %}" method="post">
+       {% csrf_token %}
+    <input type="text" class="form-control" name="property_name" placeholder="Search of Properties">
+    <div class="row">
+            <div class="col-lg-6">
+              <select id="category" name="category" class="form-control">
+                <option>Category</option>
+                  <option>Buy</option>
+                <option>Rent</option>
+                <option>Sale</option>
+              </select>
+            </div>
+            <div class="col-lg-6">
+              <select  id="price" name="price" class="form-control">
+                <option>Price</option>
+                {% block pr %}
+                  {% for each in price %}
+                  <option>{{each}}</option>
+                  {% endfor %}
+                  {% endblock %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+          <div class="col-lg-12">
+              <select name="type" class="form-control">
+                <option>Property</option>
+                <option>House</option>
+                <option>Flat</option>
+                  <option>Apartment</option>
+                <option>Office Space</option>
+              </select>
+              </div>
+          </div>
+
+       {% block det %}
+          <div class="row">
+            <div class="col-lg-6">
+              <select id="bed" name="bed" class="form-control">
+                <option>Bed Rooms</option>
+                {% for elem in numbers %}
+                  <option>{{elem}}</option>
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="col-lg-6">
+              <select  id="parking" name="parking" class="form-control">
+                <option>Parking Place</option>
+{% for elem in numbers %}
+                  <option>{{elem}}</option>
+                  {% endfor %}
+              </select>
+            </div>
+          </div>
+       {% endblock %}
+          <button class="btn btn-primary">Find Now</button>
+</form>
+  </div>
+
+
+
+<div class="hot-properties hidden-xs">
+<h4>Suggest Properties</h4>
+{% block latest %}
+    {% for data in latest %}
+    <div class="row">
+                <div class="col-lg-4 col-sm-5"><img src="{% static 'property/' %}{{data.img}}" class="img-responsive img-circle" alt="properties"></div>
+                <div class="col-lg-8 col-sm-7">
+                  <h5><a href="{% url 'property-detail' %}?id={{data.id}}">{{data.name}}</a></h5>
+                  <p class="price">{{data.price}}</p> </div>
+              </div>
+    {% endfor %}
+{% endblock %}
+
+</div>
+
+
+</div>
+
+<div class="col-lg-9 col-sm-8">
+
+    {% block content %}
+
+    <div class="row">
+
+     <!-- properties -->
+    {% ifequal result 1%}
+    {% for data in bigdata %}
+
+            <div class="col-lg-4 col-sm-6">
+                <div class="properties">
+                            <div class="image-holder">
+                                <img src="{% static 'property/' %}{{data.img}}" class="img-responsive cimg" alt="properties">
+                                {% ifequal data.status 0 %}
+                                    <div class="status sold">Available</div>
+                                {% endifequal %}
+
+                                {% ifequal data.status 1 %}
+                                    <div class="status sold">Unavailable</div>
+                                {% endifequal %}
+                            </div>
+
+                        <h4><a href="{% url 'property-detail' %}?id={{data.id}}">{{data.name}}</a></h4>
+                        <p class="price">Price: {{data.price}}</p>
+                        <div class="listing-detail">
+                                        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Bed Room">{{data.bed}}</span>
+                                        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Living Room">{{data.living}}</span>
+                                        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Parking">{{data.park}}</span>
+                                        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Kitchen">{{data.kitchen}}</span> </div>
+                                        <a class="btn btn-primary" href="{% url 'property-detail' %}?id={{data.id}}">View Details</a>
+                    </div>
+                </div>
+    {% endfor %}
+    {% endifequal %}
+
+
+    {% ifequal result 0 %}
+    <p style="font-size:14px;color:red;">{{error}}</p>
+    {% endifequal %}
+      <!-- properties -->
+{% endblock %}
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% include 'footer.html' %}

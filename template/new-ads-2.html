@@ -1,0 +1,64 @@
+{% include 'header.html' %}
+<!-- banner -->
+<script xmlns="http://www.w3.org/1999/html">
+    var counter=1;
+    $(document).ready(function(){
+        $('#adder').click(function(){
+            if(counter<10){
+            $('#form').append("<input type='file' class='form-control' id='p_img' name='p_img' />");
+                }
+              else{alert("Maximum number of media selected.");}
+              counter+=1;
+
+        });
+
+
+    });
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Ads Registration</span>
+    <h2>Ads Registration</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 ">
+<p style="color:blue;font-size:20px;margin-top:-50px;">{{success}}</p>
+      <form id="login" action="{% url 'ads-finish' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+          <label>Select Image</label>
+          <input type="file" class="form-control" id="p_img" name="p_img" />
+
+          <div id="form"></div>
+            <button class="btn btn-success" type="button" id="adder">Add More Images</button>
+          <br><br>
+          <input type="file" class="form-control" id="p_video" name="p_vid" />
+            <p style="color:blue;">Video upload size is 20 MB</p>
+          <br/><br/>
+      <input type="submit" id="btn" class="btn btn-success" value="Submit" />
+          <br/><br/>
+<p id="wait"><b><a href="{% url 'new-ads' %}">Skip</a></b></p>
+</form>
+
+      <br>
+      <p style="color:blue;font-size:17px;margin-left:150px;">2 of 2 submission of ads registration</p>
+<br/>
+
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

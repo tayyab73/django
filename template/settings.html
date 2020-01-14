@@ -1,0 +1,369 @@
+{% include 'header.html' %}
+<!-- banner -->
+{% load staticfiles %}
+<style>
+        .event{
+    color:white;
+    }
+    .custom_table{
+    width:200px;
+    height:100%;
+    }
+
+
+.notify{
+color:green;
+display:block;
+}
+.notify:hover{
+color:white;
+background-color:green;
+}
+.tdd{
+display:block;
+width:200px;
+font-size:20px;
+text-align:center;
+
+}
+
+.tabs{
+margin-left:-300px;
+}
+
+.handle_resp{
+width:700px;
+height:500px;
+
+}
+
+</style>
+<script src="{% static 'js/help.js' %}" ></script>
+
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Settings</span>
+    <h2>Settings</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-8 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 " style="margin-top:-50px;">
+      <div class="col-lg-2 tabs">
+        <table class="table custom_table">
+            <tr><td class="tdd"><a class="event notify" id="profile">Profile</a></td></tr>
+            <tr><td class="tdd"><a class="event notify" id="change_pass">Change Password</a></td></tr>
+            <tr><td class="tdd"><a class="event notify" id="ad_history">Ads History</a></td></tr>
+        <tr><td class="tdd"><a class="event notify" id="account">Deactivation</a></td></tr>
+
+        </table>
+        </div>
+
+      <div class="contents" style="float:right;margin-right:50px;width:650px;margin-left:50px;">
+
+
+          </div>
+  </div>
+</div>
+</div>
+
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+
+<div id="editpop" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="row">
+        <div class="col-sm-9 login">
+        <h4>Edit Profile Section</h4>
+          <form class="" role="form">
+        <div class="form-group">
+          <label class="sr-only" for="fullname">FullName</label>
+          <input type="text" class="form-control" id="fullname"  placeholder="Fullname">
+        </div>
+        <div class="form-group">
+          <label class="sr-only" for="email">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="Email">
+        </div>
+
+             <div class="form-group">
+          <label class="sr-only" for="address">Address</label>
+          <input type="text" class="form-control" id="address" placeholder="Address">
+        </div>
+             <div class="form-group">
+          <label class="sr-only" for="phone">Phone</label>
+          <input type="number" class="form-control" id="phone" placeholder="Phone">
+        </div>
+
+        <button type="submit" class="btn btn-success" id="pchange">ChangeIt</button>
+      </form>
+            <br>
+          <p style="color:green"><b>Please fill any field that you want change.</b></p>
+            <p style="color:red" id="perror"><b></b></p>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+        $('#profile').click(function(e){
+            e.preventDefault();
+
+            $('.contents').empty();
+            var prof="{% include 'profile.html' %}";
+            $('.contents').append(prof);
+
+        });
+
+
+
+       $('#change_pass').click(function(e){
+            e.preventDefault();
+
+            $('.contents').empty();
+            var prof="{% include 'change_password.html' %}";
+            $('.contents').append(prof);
+
+        });
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//"<p class='margin-top:-100px;'>Address:"+lists[i].address+","+lists[i].city+"</p>"+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+          $('#ad_history').click(function(e){
+            e.preventDefault();
+            $('.contents').empty();
+
+            $.ajax({
+               type:'post',
+               url:"{% url 'adshistory' %}",
+               data:{},
+               dataType:'json',
+               success: function (data) {
+
+                  if (data.type==0) {$('.contents').append("<p>"+data.resp+"</p>");}
+        		    else{
+        		    var lists=data.resp;
+        		        for(var i=0;i<lists.length;i++){
+        		            var prof="<div class='bkp'><div style='float:left;width:150px;height:150px;'>"+
+              "<img style='width:220px;height:200px;' src='{% static 'property/' %}"+lists[i].img+"' alt='Image' /></div>"+
+              "<div class='sub' style='float:left;width:420px;height:150px;margin-left:80px;'>"+
+                  "<h3><a href='{% url 'property-detail' %}?id="+lists[i].id+"'>"+lists[i].title+"</a></h3>"+
+                    "<p>Price:"+lists[i].price+"</p><p style='margin-top:-30px;'>Category:"+lists[i].category+"</p>"+
+                        "<p class='p_id'>PropertyID:"+lists[i].id+"</p>"+
+                            "</div><br><br><br>"+
+          "<div style='margin-top:100px;margin-left:230px;width:220px;height:50px;'>"+
+              "<a href='{% url 'editads' %}?id="+lists[i].id+"'class='btn btn-primary editads' style='width:100px;padding:5px;'>Edit</a>"+
+          "<button class='btn btn-primary delads' id='ads' style='width:100px;'>Delete</button></div></div><br><br>";
+                            $('.contents').append(prof);
+        		        }
+        		    }
+        			}
+                 });
+        });
+
+$(document.body).on('click','.editads',function(e){
+
+
+    var _btn = this;
+    var divp = $(_btn).parent().parent();
+    var subp=divp.find(".sub");
+    var pp=subp.find(".p_id").text();
+    var arr=new Array();
+
+    arr=pp.split(":");
+    window.reload("{% url 'editads' %}?id="+arr[1]);
+    });
+
+
+
+$(document.body).on('click','.delads',function(e){
+    e.preventDefault();
+
+    var _btn = this;
+    var divp = $(_btn).parent().parent();
+    var subp=divp.find(".sub");
+    var pp=subp.find(".p_id").text();
+    var arr=new Array();
+
+    arr=pp.split(":");
+
+    $.ajax({
+     type:'post',
+               url:"{% url 'delads' %}",
+               data:{'p_id':arr[1]},
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {
+                    $('#user').val('');
+                 divp.remove();
+                //location.reload();
+                }
+        		else{alert(data.resp);}		}
+    });
+
+
+});
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        $('#account').click(function(e){
+            e.preventDefault();
+
+            $('.contents').empty();
+            var prof="<div><p> <b>By pressing deactivation button, deactivate your account.</b></p><button class='btn btn-success' id='deac'>Deactivate Account</button></div>"+
+            "<p style='color:red;' id='acmsg'> </p>";
+            $('.contents').append(prof);
+
+        });
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////Change Password///////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        $(document.body).on('blur','#old_pass',function(e){
+        e.preventDefault();
+        var arg=$('#old_pass').val();
+        if(arg.length<8){$('#error_oldpass').text("Please fill this field at least 8 characters.");}
+        else{$('#error_oldpass').text("");}
+        });
+
+
+       $(document.body).on('blur','#new_pass',function(e){
+        e.preventDefault();
+        var arg=$('#new_pass').val();
+        if(arg.length<8){$('#error_newpass').text("Please fill this field at least 8 characters.");}
+        else{$('#error_newpass').text("");}
+        });
+
+
+        $(document.body).on('blur','#con_pass',function(e){
+        e.preventDefault();
+        var arg=$('#con_pass').val();
+        var agr2=$('#new_pass').val();
+        if(arg.length<8){$('#error_conpass').text("Please fill this field at least 8 characters.");}
+        else if(arg!=agr2){$('#error_conpass').text("Both passwords does not matched.");}
+        else{$('#error_conpass').text("");}
+        });
+
+        $(document.body).on('click','#change_',function(e){
+        e.preventDefault();
+        var ag=$('#old_pass').val();
+        var arg=$('#con_pass').val();
+        var agr2=$('#new_pass').val();
+        if(ag.length<8){$('#error_oldpass').text("Please fill this field at least 8 characters.");}
+        else if(agr2.length<8){$('#error_newpass').text("Please fill this field at least 8 characters.");}
+        else if(arg.length<8){$('#error_conpass').text("Please fill this field at least 8 characters.");}
+        else if(arg!=agr2){$('#error_conpass').text("Both passwords does not matched.");}
+        else{
+
+        $.ajax({
+         type:'post',
+               url:"{% url 'change_password' %}",
+               data:{'old_pass':ag,'new_pass':agr2,'con_pass':arg},
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {$('#user').val('');$('#user').text(data.resp);$('#old_pass').val("");$('#new_pass').val("");$('#con_pass').val("");}
+                  else if(data.type==2){$('#user').val('');$('#user').text(data.resp);}
+        		else{$('#user').text("Server is not responding.");}		}
+        });
+        }
+        });
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+$(document.body).on('click','#deac',function(e){
+        e.preventDefault();
+          $.ajax({
+         type:'post',
+               url:"{% url 'ac_deactive' %}",
+               data:{},
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {$('#acmsg').text('');$('#acmsg').text(data.resp);}
+                  else if(data.type==2){$('#acmsg').text('');$('#acmsg').text(data.resp);}
+        		else{$('#acmsg').text("Server is not responding.");}		}
+        });
+
+        });
+
+
+      $(document.body).on('click','#pchange',function(e){
+        e.preventDefault();
+        var db='{';
+        var flag=false;
+        var error="";
+        var name=$('#fullname').val();
+        var email=$('#email').val();
+        var address=$('#address').val();
+        var phone=$('#phone').val();
+
+
+        if(name!=null&&name.length>0){db+='"fullname"'+':"'+name+'"';flag=true;}
+
+        if(email!=null&&email.length>0){
+
+          if(flag){db+=',';}
+            db+='"email"'+':"'+email+'"';flag=true;
+            }
+
+        if(address!=null&&address.length>0){
+              if(flag){db+=',';}
+               db+='"address"'+':"'+address+'"';
+               flag=true;
+               }
+
+        if(phone!=null&&phone.length>0){
+
+              if(phone.length<14 ||phone.length>14){error+="Please fill correct format of phone number like 00923212345678";}
+              if(flag){db+=',';}
+                db+='"phone"'+':"'+phone+'"';
+                flag=true;
+
+
+        }
+        db+='}';
+
+        if(error!=""){$('#perror').text(error);}
+        else{
+
+                    $('#perror').text("");
+                   var obj = $.parseJSON(db);
+           $.ajax({
+         type:'post',
+               url:"{% url 'chg_profile' %}",
+               data:obj,
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {$('#perror').text('');$('#perror').text(data.resp);$(this).parent().remove();}
+                  else if(data.type==2){$('#perror').text('');$('#perror').text(data.resp);}
+        		else{$('#perror').text("Server is not responding.");}		}
+        });
+            }
+        });
+
+
+
+    });
+</script>
+
+{% include 'footer.html' %}

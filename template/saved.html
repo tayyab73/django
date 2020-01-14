@@ -1,0 +1,99 @@
+{% include 'header.html' %}
+<!-- banner -->
+{% load staticfiles %}
+<style>
+    .event{
+    color:white;
+    }
+    .p_id{
+    margin-top:-30px;
+    }
+    .bk{
+    margin-top:-50px;
+    }
+
+</style>
+<script>
+$(document).ready(function(){
+
+$('.delrow').click(function(e){
+    e.preventDefault();
+
+    var _btn = this;
+    var divp = $(_btn).parent();
+    var pp=divp.find(".p_id").text();
+    var arr=new Array();
+
+    arr=pp.split(":");
+
+    $.ajax({
+     type:'post',
+               url:"{% url 'delete_p' %}",
+               data:{'p_id':arr[1]},
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {
+                    $('#user').val('');
+                 divp.remove();
+                //location.reload();
+                }
+        		else{$('#user').text(data.resp);}		}
+    });
+
+
+});
+
+
+
+});
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Saved Properties</span>
+    <h2>Saved Properties</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 " style="float:left;">
+
+{% block content %}
+      {% ifequal res 1 %}
+      {% for row in data %}
+      <div class="bk">
+          <img src="{% static 'property/' %}{{row.img}}"  style="float:left;width:200px;height:200px;padding-right:5px;"/>
+          <h4><a href="{% url 'property-detail' %}?id={{row.id}}" class="title">{{row.name}}</a></h4>
+          <h4>Posted by:{{row.fullname}}</h4>
+          <p>Price:{{row.price}}</p>
+          <p class="p_id">Property ID:{{row.id}}</p>
+          <p>Saved Date:{{row.date}}</p>
+          <button class="btn btn-primary delrow" style="width:80px;margin-left:470px;margin-top:-80px;">Delete</button>
+      </div>
+
+      <br><br>
+      {% endfor %}
+      {% endifequal %}
+
+      {% ifequal res 0 %}
+      <h3>No data found that you saved...</h3>
+      {% endifequal%}
+
+      {% endblock %}
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

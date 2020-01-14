@@ -1,0 +1,256 @@
+{% include 'header.html' %}
+<!-- banner -->
+{% load staticfiles %}
+<style>
+    .event{
+    color:white;
+    }
+    .custom_table{
+    width:200px;
+    height:100%;
+    }
+
+
+.notify{
+color:green;
+display:block;
+}
+.notify:hover{
+color:white;
+background-color:green;
+}
+.tdd{
+display:block;
+width:200px;
+font-size:20px;
+text-align:center;
+
+}
+
+.tabs{
+margin-left:-300px;
+}
+
+.handle_resp{
+width:700px;
+height:500px;
+
+}
+</style>
+<script>
+$(document).ready(function(){
+
+       function getPropertyID(ref){
+            var link=ref.find('a').attr('href');
+
+            var p_id=new Array();
+            p_id=link.split('=');
+            return p_id[1];
+       }
+
+        function getName(ref){
+              var link=ref.find('p.u').text();
+               var p_id=new Array();
+               p_id=link.split(':');
+               return p_id[1];
+
+
+        }
+
+
+    $(document.body).on('click','.acc',function(e){
+        e.preventDefault();
+        var tp=$(this).parent().parent();
+
+        var pid=getPropertyID(tp);
+        var name=getName(tp);
+
+
+    $.ajax({
+               type:'post',
+               url:"{% url 'upd_request' %}",
+               data:{'id':pid,'name':name},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.type==1) {tp.find('.acc').text("Accepted");}
+                   else {alert(data.resp);}
+                  }
+                  });
+
+
+    });
+
+
+    $(document.body).on('click','.prof',function(e){
+        e.preventDefault();
+        var tp=$(this).parent().parent();
+
+        var pid=getPropertyID(tp);
+        var name=getName(tp);
+
+
+    $.ajax({
+               type:'post',
+               url:"{% url 'profile_pay' %}",
+               data:{'id':pid,'name':name},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.type==1) {
+                                    var f="Name: "+data.resp.name+"\n\rEmail: "+data.resp.email+"\n\rAddress: "+data.resp.address+"\n\rPhone: "+data.resp.phone;
+                                    alert(f);
+                                    }
+                   else {alert(data.resp);}
+                  }
+                  });
+
+
+    });
+
+
+
+$(document.body).on('click','.rest',function(e){
+        e.preventDefault();
+        var tp=$(this).parent().parent();
+	var link=getPropertyID(tp);
+     var name=getName(tp);
+
+    $.ajax({
+               type:'post',
+               url:"{% url 'trans_pay' %}",
+               data:{'id':link,'name':name},
+               dataType:'json',
+               success: function (data,err) {
+                 alert(data.resp);
+                  }
+                  });
+		
+});
+
+
+    $(document.body).on('click','.del',function(e){
+        e.preventDefault();
+        var tp=$(this).parent().parent();
+
+        var pid=getPropertyID(tp);
+        var name=getName(tp);
+
+        $.ajax({
+               type:'post',
+               url:"{% url 'delete_re' %}",
+               data:{'id':pid,'name':name},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.type==1) {tp.remove();}
+                  else {alert(data.resp);}
+                  }
+                  });
+
+    });
+
+
+
+    $('.event').click(function(){
+        var arg=$(this).text();
+        var lst=new Array();
+        lst=arg.split(' ');
+        var resps=false;
+        if(lst[1]=="Response"){resps=true;lst[0]=lst[1];}
+    $.ajax({
+               type:'post',
+               url:"{% url 'alert_notify' %}",
+               data:{'arg':lst[0]},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.type==0) {$('#response').empty();$('#response').append("<p>"+data.resp+"</p>");}
+                  else if(data.type==1){
+                  $('#response').empty();
+                            var res=new Array();
+                            res=data.resp;
+                            var st=false;
+                            var rat=false;
+                            var payment=false;
+                            if(lst[0]=='Payment'){payment=true;}
+                            if(lst[0]=='Rating'||'Feedback'==lst[0])
+                            {st=true;if(lst[0]=='Rating'){rat=true;}}
+                            for(var i=0;i<res.length;i++){
+                                var img="{% static 'property/' %}"+res[i].img;
+                                var link_="{% url 'property-detail' %}?id="+res[i].id;
+                                var row="<div><img src='"+img+"' style='width:180px;height:180px;float:left;padding-right:10px;' />"+
+                                "<a href='"+link_+"'><h5>"+res[i].name+"</h5></a><br>";
+                                if(!resps){row+="<p class='u' style='margin-top:-20px;'>Requested By:"+res[i].user+"</p><p style='margin-top:-20px;'>Dated:"+res[i].date+"</p>";}
+                                if(resps){row+="<p class='u' style='margin-top:-20px;'>Property Holder:"+res[i].user+"</p><p style='margin-top:-20px;'><b>Branch:"+res[i].branch+"</b></p><br><p style='margin-top:-20px;'><b>Account Number:"+res[i].account+"</b></p>";}
+                                if(resps){row+="<button class='btn btn-success rest' style='margin-top:-40px;float:right;width:100px;height:50px;margin-right:100px;'>Transfer</button>";}
+                                if(st==true)
+                                {
+                                if(rat){row+="<p style='margin-top:-20px;'><b>Rating:"+res[i].resp+"</br></p>";}
+                                else{row+="<p style='margin-top:-20px;'><b>Feedback:"+res[i].resp+"</b></p>";}
+
+
+                                }
+                                if(payment)
+                                {row+="<div style='float:right;marign-left:-200px;margin-top:10px;width:300px;'>"+
+                                                    "<a style='width:80px;' class='btn btn-success prof'>Profile</a>"+
+                                                "<a style='width:80px;margin-left:10px;'  class='btn btn-success acc'>Accept</a>"+
+                                                "<a style='width:80px;margin-left:10px;' class='btn btn-success del'>Delete</a></div>";}
+
+                                row+="</div><br><br><br><br>";
+                                $('#response').append(row);
+                                }
+                            }
+        				}
+
+
+                         });
+    });
+
+
+
+
+
+
+
+
+});
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Notification</span>
+    <h2>Notification</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 " style="float:left;">
+<div class="col-lg-2 tabs">
+<table class="table custom_table">
+    <tr><td class="tdd"><a class="event notify">Email Alert</a></td></tr>
+    <tr><td class="tdd"><a class="event notify">SMS Alert</a></td></tr>
+    <tr><td class="tdd"><a class="event notify">Rating</a></td></tr>
+    <tr><td class="tdd"><a class="event notify">Feedback</a></td></tr>
+    <tr><td class="tdd"><a class="event notify">Payment Requests</a></td></tr>
+    <tr><td class="tdd"><a class="event notify">Payment Response</a></td></tr>
+
+</table>
+</div>
+
+      <div class="col-lg-6 handle_resp" id="response">
+      </div>
+
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

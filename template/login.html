@@ -1,0 +1,83 @@
+{% include 'header.html' %}
+<!-- banner -->
+<script>
+    $(document).ready(function(){
+        $('#email').blur(function(e){
+         var username=$(this).val();
+         e.preventDefault();
+        if(username.length==0){$('#user').text("Please fill this field");}
+            else{$('#user').text("");}
+              $.ajax({
+               type:'post',
+               url:"{% url 'checkLoginUsername' %}",
+               data:{'user':username},
+               dataType:'json',
+               success: function (data) {
+                  if (data.is_taken && data.is_taken.length>0) {$('#user').val('');$('#user').text(data.is_taken);}
+        		else{$('#user').empty();}		}
+                         });
+
+        });
+
+
+    $('#pass').blur(function(e){
+    var password=$(this).val();
+         e.preventDefault();
+        if(password.length==0){$('#password').text("Please fill this password field");}
+        else if(password.length<8){$('#password').text("Please fill password at least 8 character");}
+            else{$('#password').text("");}
+
+    });
+
+     $('#login').submit(function(e){
+
+     var user=$('#email').val();
+     var password=$('#pass').val();
+     if(user.length==0 || password.length==0){e.preventDefault();$('#error').text("Not submit due to not filling fields");}
+     else if(password.length<8){$('#password').text("Please fill password at least 8 character");}
+     else{$('#error').text("");}
+     });
+
+    });
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Login</span>
+    <h2>Login</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 ">
+<p style="color:blue;font-size:20px;margin-top:-50px;">{{success}}</p>
+      <form id="login" action="{% url 'home' %}" method="post">
+    {% csrf_token %}
+                <input type="text" class="form-control" id="email" placeholder="Enter Username" name="form_email" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="user"></p>
+                <input type="password" class="form-control" id="pass" placeholder="Password" name="form_password" />
+<p style="color:red;font-size:16px;" id="password"></p>
+      <input type="submit" id="btn" class="btn btn-success" value="SignIn" />
+
+</form>
+<br/>
+                <div style="margin-left:200px;">
+                    <a href="{% url 'forget-password' %}">Forget Password?</a>
+                     <a href="{% url 'register' %}" style="margin-left:20px;">Register</a>
+                </div>
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

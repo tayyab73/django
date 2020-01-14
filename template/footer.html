@@ -1,0 +1,70 @@
+{% load staticfiles %}
+<script>
+    $(document).ready(function(){
+        $('#notify').submit(function(e){
+            e.preventDefault();
+            var email=$('#s_email').val();
+            if(email.length==0){alert('Please fill email address field');}
+            else{
+             $.ajax({
+
+         type:'post',
+               url:"{% url 'c_subscribe' %}",
+               data:{'email':email},
+               dataType:'json',
+               success: function (data) {
+                  alert(data.resp);
+                  		}
+
+        });
+            }
+        });
+
+    });
+
+</script>
+<div class="footer">
+<div class="container">
+
+<div class="row">
+            <div class="col-lg-3 col-sm-3">
+                   <h4>Information</h4>
+                   <ul class="row">
+                <li class="col-lg-12 col-sm-12 col-xs-3"><a href="{% url 'about' %}">About</a></li>
+                <li class="col-lg-12 col-sm-12 col-xs-3"><a href="{% url 'agents' %}">Developers</a></li>
+
+                <li class="col-lg-12 col-sm-12 col-xs-3"><a href="{% url 'contact' %}">Contact</a></li>
+              </ul>
+            </div>
+            
+            <div class="col-lg-3 col-sm-3">
+                    <h4>Newsletter</h4>
+                    <p>Get notified about the latest properties in our marketplace.</p>
+                    <form class="form-inline" id="notify" method="post" role="form">
+                            <input type="text" placeholder="Enter Your email address" id="s_email" name="email" class="form-control">
+                                <button class="btn btn-success" type="submit">Notify Me!</button></form>
+            </div>
+            
+            <div class="col-lg-3 col-sm-3">
+                    <h4>Follow us</h4>
+                    <a href="#"><img src="{% static 'images/facebook.png' %}" alt="facebook"></a>
+                    <a href="#"><img src="{% static 'images/twitter.png' %}" alt="twitter"></a>
+                    <a href="#"><img src="{% static 'images/linkedin.png' %}" alt="linkedin"></a>
+                    <a href="#"><img src="{% static 'images/instagram.png' %}" alt="instagram"></a>
+            </div>
+
+             <div class="col-lg-3 col-sm-3">
+                    <h4>Contact us</h4>
+                    <p><b>BookIt Realestate Inc.</b><br>
+<span class="glyphicon glyphicon-map-marker"></span> UET Lahore, Pakistan <br>
+<span class="glyphicon glyphicon-envelope"></span> muhammadtayyab73@gmail.com<br>
+                        <span class="glyphicon glyphicon-envelope"></span> riz11667@gmail.com<br>
+<span class="glyphicon glyphicon-earphone"></span> (0092)3246467431</p>
+            </div>
+        </div>
+<p class="copyright">Copyright 2018. All rights reserved.	</p>
+
+</div></div>
+
+</body>
+</html>

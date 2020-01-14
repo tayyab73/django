@@ -1,0 +1,150 @@
+{% include "header.html" %}
+{% load staticfiles %}
+<style>
+  .cimg{height:170px;}
+</style>
+<script>
+  $(document).ready(function(){
+
+
+    });
+
+
+</script>
+<div class="">
+    
+
+            <div id="slider" class="sl-slider-wrapper">
+
+        <div class="sl-slider">
+          {% block content %}
+        {% for data in slider %}
+          <div class="sl-slide" data-orientation="horizontal" data-slice1-rotation="-25" data-slice2-rotation="-25" data-slice1-scale="2" data-slice2-scale="2">
+            <div class="sl-slide-inner">
+              <div class="bg-img bg-img-1"></div>
+              <h2><a href="{% url 'property-detail' %}?id={{data.id}}">{{data.title}}</a></h2>
+              <blockquote>              
+              <p class="location"><span class="glyphicon glyphicon-map-marker"></span> {{data.address}}</p>
+              <p>{{data.desc}}</p>
+              <cite>{{data.price}}</cite>
+              </blockquote>
+            </div>
+          </div>
+          {% endfor %}
+          {% endblock %}
+
+        </div><!-- /sl-slider -->
+
+
+
+        <nav id="nav-dots" class="nav-dots">
+          <span class="nav-dot-current"></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </nav>
+
+      </div><!-- /slider-wrapper -->
+</div>
+
+
+
+<div class="banner-search">
+  <div class="container"> 
+    <!-- banner -->
+    <h3>Buy, Sale & Rent</h3>
+    <div class="searchbar">
+      <div class="row">
+        <div class="col-lg-6 col-sm-6">
+          <form action="{% url 'query-search' %}" method="post">
+            {% csrf_token %}
+          <input type="text" class="form-control" name="property_name" placeholder="Search of Properties">
+          <div class="row">
+            <div class="col-lg-3 col-sm-3 ">
+              <select name="category" id="category" class="form-control">
+                <option>Category</option>
+                <option>Buy</option>
+                <option>Rent</option>
+                <option>Sale</option>
+              </select>
+            </div>
+            <div class="col-lg-3 col-sm-4">
+              <select name="price" id="price" class="form-control">
+                <option>Price</option>
+                {% block list %}
+                {% for row in price %}
+                <option>{{row}}</option>
+                {% endfor %}
+                {% endblock %}
+              </select>
+            </div>
+            <div class="col-lg-3 col-sm-4">
+            <select name="type" class="form-control">
+                <option>Property</option>
+              <option>House</option>
+              <option>Flat</option>
+              <option>Apartment</option>
+                <option>Office Space</option>
+              </select>
+              </div>
+              <div class="col-lg-3 col-sm-4">
+              <input class="btn btn-success" value="Find Now" type="submit"/>
+              </div>
+          </div>
+          
+        </form>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- banner -->
+<div class="container">
+  <div class="properties-listing spacer"> <a href="{% url 'query-search' %}?req=all" class="pull-right viewall">View All Listing</a>
+    <h2>Featured Properties</h2>
+    <div id="owl-example" class="owl-carousel">
+      {% block content2 %}
+      {% for data in feature %}
+      <div class="properties">
+        <div class="image-holder"><img src="{% static 'property/' %}{{data.img}}" class="img-responsive cimg" alt="properties"/>
+          {% ifequal data.status 0 %}
+          <div class="status">Available</div>
+          {% endifequal %}
+          {% ifequal data.status 1 %}
+          <div class="status">Unavailable</div>
+          {% endifequal %}
+        </div>
+        <h4><a href="{% url 'property-detail' %}?id={{data.id}}">{{data.title}}</a></h4>
+        <p class="price">{{data.price}}</p>
+        <div class="listing-detail">
+          <span data-toggle="tooltip" data-placement="bottom" data-original-title="Bed Room">{{data.bed}}</span>
+          <span data-toggle="tooltip" data-placement="bottom" data-original-title="Living Room">{{data.living}}</span>
+          <span data-toggle="tooltip" data-placement="bottom" data-original-title="Parking">{{data.parking}}</span>
+          <span data-toggle="tooltip" data-placement="bottom" data-original-title="Kitchen">{{data.kitchen}}</span>
+        </div>
+        <a class="btn btn-primary" href="{% url 'property-detail' %}?id={{data.id}}">View Details</a>
+      </div>
+      {% endfor %}
+      {% endblock %}
+
+      
+    </div>
+  </div>
+  <div class="spacer">
+    <div class="row">
+      <div class="col-lg-6 col-sm-9 recent-view">
+        <h3>About Us</h3>
+        <p>Our mission is to provide a range of property rated information and users suggestion about property. Also provide SMS alert system to acknowledgnment to property owner. Our system provide texting messaging and video calling in between client and owner. Also you can navigate the location of property using Maps.<br><a href="{% url 'about' %}">Learn More</a></p>
+      
+      </div>
+
+
+        </div>
+      </div>
+
+  </div>
+
+{% include "footer.html" %}

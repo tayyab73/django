@@ -1,0 +1,261 @@
+{% include 'header.html' %}
+<!-- banner -->
+{% load staticfiles %}
+
+<style>
+
+    .entity:hover>td>a.f{display:block;}
+
+    .entity>td>a.f{display:none;}
+
+    .client_info{
+    float:left;
+    margin-left:-50px;
+    background-color:white;
+    width:300px;
+    height:700px;
+    }
+
+    .chat_table{
+    margin-left:100px;
+    background-color:white;
+    }
+
+    .chat_msg{
+    width:550px;
+    height:495px;
+    background-color:lightgray;
+    overflow-y: auto;
+    }
+
+    .chat_msg2{
+    width:555px;
+    height:500px;
+    overflow-y: auto;
+
+    background-color:lightgray;
+    }
+
+
+</style>
+<script src="{% static 'js/jquery.scrollIntoView.js' %}"></script>
+<script>
+    $(document).ready(function(){
+        var counter=0;
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var client = url.searchParams.get("client");
+
+
+        var perv_msg="";
+        var chat_len=0;
+        var perv="";
+        var scrolled=0;
+        var counter_msg=0;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function getMsg(msgfrom){
+            var msgs=new Array();
+            if(msgfrom.length>0){
+                    msgs=msgfrom.split('%');
+
+
+                    var build="";
+                    chat_len=msgs.length;
+                    counter_msg=msgs.length;
+                    for(var i=0; i<msgs.length;i++){
+                        var c=new Array();
+                            c=msgs[i].split("+");
+
+                            var row="";
+
+                            if (c[0]!=client){row="<tr style='background-color:lightgreen;color:white;height:auto;'><td></td><td>"+c[1]+":<b>from me</b></td></tr>";}
+                            else{row="<tr style='background-color:white;color:black;height:auto;'><td></td><td>"+c[1]+":<b>from "+client+"</b></td></tr>";}
+                        build+=row;
+                    }
+            $('.chat_msg').append(build);
+            scrolled+=(counter_msg*100);
+            $('.chat_msg').animate({
+                             scrollBottom:  scrolled
+                            });
+                }
+            }
+
+        function connectServer(){
+            $('.chat_msg').empty();
+                counter=0;
+                $.ajax({
+                         type:'post',
+                        url:"{% url 'getMsg' %}",
+                        data:{'client':client},
+                        dataType:'json',
+                        success: function (data) {
+                            if (data.is_taken && data.is_taken.length>0) {getMsg(data.is_taken);}
+        		                else{$('#user').empty();}		}
+
+                         });
+                     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        $('#chat').submit(function(e){
+
+        e.preventDefault();
+        if(client==null){alert("Please select some client to chat...");}
+        else{
+                var msg=$('#msg').val();
+                if(msg.length==0){alert("Please type some text");}
+                else{
+                 perv_msg=msg;
+                   var spaces="";
+                    var row="<tr style='background-color:lightgreen;color:white;'><td>"+spaces+"</td><td>"+msg+":<b>from me</b></td></tr>";
+
+                    $('.chat_msg').append(row);
+
+
+                       scrolled+=100;
+
+                     $('.chat_msg').animate({
+                             scrollBottom:  scrolled
+                            });
+
+                    $('#msg').val('');
+                    $.ajax({
+                        type:'post',
+                           url:"{% url 'sendUserMsg' %}",
+                            data:{'client':client,'msg':msg},
+                        dataType:'json',
+                        success: function (data) {
+                         if (data.is_taken && data.is_taken.length>0) {$('#user').val('');$('#user').text(data.is_taken);}
+        		    else{$('#user').empty();}		}
+
+                         });
+                }
+                }
+
+        });
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+           function operationMsg(val){
+           if(val.length>0){
+                var row="<tr><td></td><td>"+val+":<b>from "+client+"</b></td></tr>";
+                 if(counter==0){
+                    counter+=1;
+                    $('.chat_msg').append(row);
+                }
+                $('#msg_table').append(row);
+            }
+           }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function setMsg(msg){
+
+            if(msg!=perv){
+             var row="<tr style='background-color:white;color:black;height:auto;'><td></td><td>"+msg+":<b>from "+client+"</b></td></tr>";
+                            $('.chat_msg').append(row);
+                             scrolled+=100;
+
+                     $('.chat_msg').animate({
+                             scrollBottom:  scrolled
+                            });
+
+                            perv=msg;
+                            }
+        }
+
+        function getclientMsg(){
+          $.ajax({
+               type:'post',
+               url:"{% url 'getClientMsg' %}",
+               data:{'client':client},
+               dataType:'json',
+               success: function (data) {
+                  if (data.is_taken && data.is_taken.length>0) {setMsg(data.is_taken);}
+        		else{$('#user').empty();}		}
+
+                         });
+        }
+
+if(client!=null){
+    if (client.length>0){
+            setInterval(getclientMsg,1000);
+            connectServer();
+        }
+}
+
+$('.f').click(function(e){
+        e.preventDefault();
+        var par=$(this).parent().parent();
+            var username=par.find(".user").attr("href");
+            var arr=new Array();
+            arr=username.split("=");
+            $.ajax({
+                type:'post',
+               url:"{% url 'blockf' %}",
+               data:{'client':arr[1]},
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {
+
+                 par.remove();
+
+                }
+        		else{alert(data.resp);}		}
+                    });
+        });
+
+    });
+</script>
+<div class="inside-banner" >
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Chat Section</span>
+    <h2>Chat Section</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+    <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 client_info" style="float:left;">
+        <table class="table">
+            <h2>Chat List</h2>
+            {% block friendlist %}
+            {% for row in chat_client %}
+
+            <tr class="entity"><td><a  class="user" href="{% url 'chat'%}?client={{row.user}}"><b>{{row.fullname}}</b></a></td>
+                <td style="margin-left:20px;"><a href="{% url 'video'%}?client={{row.user}}"><b>VideoCall</b></a></td>
+                <td><a class="f">Block</a></td></tr>
+            {% endfor %}
+            {% endblock %}
+        </table>
+        </div>
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 chat_table" style="float:left;">
+      <div><h4>Chat History</h4></div>
+<div class="chat_msg2">
+    <table class="chat_msg"></table>
+</div>
+      <form id="chat" action="" method="post">
+    {% csrf_token %}
+          <div style="width:555px;">
+                <input type="text" class="form-control" id="msg" style="width:440px;float:left;" placeholder="Type Message" name="msg" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="user"></p>
+      <input type="submit" id="btn" class="btn btn-success" style="width:100px;float:left;margin-left:10px;" value="Send" />
+</div>
+</form>
+<br/>
+
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

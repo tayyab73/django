@@ -1,0 +1,169 @@
+{% include 'header.html' %}
+<!-- banner -->
+<style>
+.mw{
+height:50px;
+}
+    .opt{
+    margin-top:7px;
+    width:140px;
+    float:left;
+       }
+       .mcode{
+       margin-left:7px;
+       }
+    .mobile_no{
+    height:50px;
+    }
+    .mno{
+    width:260px;
+    }
+</style>
+
+<script>
+    $(document).ready(function(){
+
+    $('#user').blur(function(e){
+         var username=$(this).val();
+         e.preventDefault();
+        if(username.length==0){$('#error_user').text("Please fill this field");}
+            else{$('#error_user').text("");}
+              $.ajax({
+               type:'post',
+               url:"{% url 'r_newuser' %}",
+               data:{'user':username},
+               dataType:'json',
+               success: function (data) {
+                  if (data.is_taken && data.is_taken.length>0) {$('#error_user').val('');$('#error_user').text(data.is_taken);}
+        		else{$('#error_user').empty();}		}
+                         });
+
+        });
+
+
+    $('#fullname').blur(function(e){
+    var fullname=$(this).val();
+         e.preventDefault();
+        if(fullname.length==0){$('#error_fullname').text("Please fill this fullname field");}
+            else{$('#error_fullname').text("");}
+
+    });
+
+ $('#email').blur(function(e){
+
+    var email=$(this).val();
+         e.preventDefault();
+        if(email.length==0){$('#error_email').text("Please fill this email field");}
+            else{$('#error_email').text("");}
+
+    });
+
+     $('#pass').blur(function(e){
+    var password=$(this).val();
+         e.preventDefault();
+        if(password.length==0){$('#error_pass').text("Please fill this password field.");}
+            else if(password.length<8){$('#error_pass').text("Please fill password at least 8 characters.");}
+            else{$('#error_pass').text("");}
+
+    });
+
+     $('#con_pass').blur(function(e){
+    var password=$(this).val();
+         e.preventDefault();
+        if(password.length==0){$('#error_con_pass').text("Please fill this confirm password field");}
+            else if(password.length<8){$('#error_pass').text("Please fill password at least 8 characters.");}
+            else{$('#error_con_pass').text("");
+            if(password!=$('#pass').val()){$('#error_con_pass').text("Password and Confirm Password does not matched.");}
+               }
+    });
+
+$('#address').blur(function(e){
+    var address=$(this).val();
+         e.preventDefault();
+        if(address.length==0){$('#error_address').text("Please fill this address field");}
+            else{$('#error_address').text("");}
+
+
+    });
+
+
+$('#mobile_no').blur(function(e){
+    var num=$(this).val();
+         e.preventDefault();
+        if(num.length==0){$('#error_mobile_no').text("Please fill this mobile no field");}
+            else if(num.length>7 || num.length<7){$('#error_mobile_no').text("Please choose correct mobile number");}
+            else{$('#error_mobile_no').text("");}
+
+
+    });
+
+$('#new_register').submit(function(e){
+
+
+    });
+
+    });
+
+
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Register</span>
+    <h2>Register</h2>
+</div>
+</div>
+<!-- banner -->
+
+
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 ">
+
+<form action="{% url 'login' %}" id="new_register" method="post">
+{% csrf_token %}
+                <input type="text" class="form-control" id="fullname" placeholder="Full Name" value="{{data.name}}" name="form_name">
+    <p  id="error_fullname" style="color:red;"></p>
+               <input type="text" class="form-control" id="user" placeholder="Username" value="{{data.user}}" name="form_user">
+ <p  id="error_user" style="color:red;"></p>
+                <input type="email" class="form-control"  id="email" placeholder="Enter Email" value="{{data.email}}" name="form_email">
+     <p  id="error_email" style="color:red;"></p>
+    <input type="password" class="form-control" id="pass" placeholder="Password" name="form_password" value="">
+     <p  id="error_pass" style="color:red;"></p>
+    <input type="password" class="form-control" id="con_pass" placeholder="Confirm Password" value="" name="form_con_password">
+
+     <p  id="error_con_pass" style="color:red;"></p>
+    <div class="mobile_no" >
+        {% block cont %}
+                <select name="cc" value="{{data.cc}}" class="form-control opt mw">
+                    <option>Country Code</option>
+                    <option>+92</option>
+
+                </select>
+                <select name="mc" value="{{data.mc}}" class="form-control opt mcode mw">
+                    <option>Mobile Code</option>
+                {% for no in code %}
+                    <option>{{no}}</option>
+                    {% endfor %}
+                </select>
+    <input class="form-control opt mcode mno" name="form_phone" id="mobile_no" value="{{data.nber}}" type="number" placeholder="Mobile Number" />
+    {% endblock %}
+    </div>
+    <p  id="error_mobile_no" style="color:red;"></p>
+           <textarea rows="6" class="form-control" value="{{data.address}}"  id="address" placeholder="Address" name="form_address"></textarea>
+         <p  id="error_address" style="color:red;"></p>
+
+    <p id="error_agree"></p>
+      <input type="submit" class="btn btn-success" name="Register" />
+<p id="register" style="color:red;"></p>
+</form>
+<p style="color:red;font-size:16ox;">{{error}}</p>
+
+                
+        </div>
+  
+</div>
+</div>
+</div>
+
+{% include 'footer.html' %}

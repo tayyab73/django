@@ -1,0 +1,74 @@
+{% include 'header.html' %}
+<!-- banner -->
+<script>
+    $(document).ready(function(){
+
+     $('#payment').on('submit',function(e){
+            e.preventDefault();
+
+            var branch=$('#branch').val();
+            var account=$('#account').val();
+            var pin=$('#pin').val();
+            if(branch.length==0){$('#error').text("Please fill branch name of bank");}
+            else if(account.length==0){$('#error').text("Please fill account number field");}
+            else if(pin.length==0|| pin.length<4){$('#error').text("Please fill pin code field at least 4 digits");}
+            else{$('#error').text("");
+
+
+            $.ajax({
+
+             type:'post',
+               url:"{% url 'new_payinfo' %}",
+               data:{'branch':branch,'account':account,'pin':pin},
+               dataType:'json',
+               success: function (data) {
+                  if (data.type==1) {$('#branch').val('');$('#account').val('');$('#pin').val('');$('#suc').text(data.resp);}
+        		else{$('#error').text(data.resp);}		}
+                         });
+                         }
+
+            });
+
+
+    });
+</script>
+<div class="inside-banner">
+  <div class="container">
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Payment Information</span>
+    <h2>Payment Information</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 ">
+<p style="color:blue;font-size:20px;margin-top:-50px;" id="suc">{{success}}</p>
+      <form id="payment" method="post">
+
+                <input type="text" class="form-control" id="branch" placeholder="Enter Branch Name" name="form_branch" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="user"></p>
+                <input type="tel" class="form-control" id="account" placeholder="Account Number" name="form_account" />
+<p style="color:red;font-size:16px;" id="password"></p>
+          <input type="number" class="form-control" id="pin" placeholder="Account Pin" name="form_account" />
+<p style="color:red;font-size:16px;" id="err_pin"></p>
+      <input type="submit" class="btn btn-success" value="Save" />
+
+</form>
+<br/>
+
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

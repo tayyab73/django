@@ -1,0 +1,83 @@
+{% include 'header.html' %}
+<!-- banner -->
+<script>
+    $(document).ready(function(){
+        $('#scode').blur(function(e){
+         e.preventDefault();
+         var code_=$('#scode').val();
+
+        if(code_.length==0){$('#error_scode').text("Please fill this field");}
+            else{$('#error_scode').text("");
+              $.ajax({
+               type:'post',
+               url:"{% url 'checkVerifyScode' %}",
+               data:{'scode':code_},
+               dataType:'json',
+               success: function (data) {
+                  if (data.is_taken && data.is_taken.length>0) {$('#error_scode').val('');$('#error_scode').text(data.is_taken);}
+        		else{$('#error_scode').empty();}		}
+                         });
+                         }
+
+        });
+
+        $('#verify_c').submit(function(e){
+        e.preventDefault();
+         var code_=$('#scode').val();
+
+        if(code_.length==0){$('#error_scode').text("Please fill this field");}
+            else{$('#error_scode').text("");
+              $.ajax({
+               type:'get',
+               url:"{% url 'updateVerification' %}",
+               data:{'scode':code_},
+               dataType:'json',
+               success: function (data,err) {
+
+                  if (data.is_taken && data.is_taken.length>0) {$('#resp').val('');$('#resp').text(data.is_taken);}
+        		else{$('#resp').empty();}		}
+                         });
+
+                         }
+
+        });
+
+    });
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Login</span>
+    <h2>Login</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 ">
+<p style="color:blue;font-size:20px;margin-top:-50px;">{{success}}</p>
+      <form id="verify_c" action="" method="post">
+    {% csrf_token %}
+                <input type="password" class="form-control" id="scode" placeholder="Security Code" name="form_scode" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="error_scode"></p>
+
+      <input type="submit" id="btn" class="btn btn-success" value="Verify" />
+
+</form>
+<br/>
+<p style="color:blue;font-size:16px;" id="resp"></p>
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

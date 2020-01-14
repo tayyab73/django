@@ -1,0 +1,395 @@
+{% include 'header.html' %}
+{% load staticfiles %}
+<!-- banner -->
+
+<style>
+    .rating {
+    float:left;
+    width:300px;
+    margin-left:-110px;
+}
+.rating span { float:right; position:relative; }
+.rating span input {
+    position:absolute;
+    top:0px;
+    left:0px;
+    opacity:0;
+}
+.rating span label {
+    display:inline-block;
+    width:30px;
+    height:30px;
+    text-align:center;
+    color:#FFF;
+    background:#ccc;
+    font-size:30px;
+    margin-right:2px;
+    line-height:30px;
+    border-radius:50%;
+    -webkit-border-radius:50%;
+}
+.rating span:hover ~ span label,
+.rating span:hover label,
+.rating span.checked label,
+.rating span.checked ~ span label {
+    background:#72b70f;
+    color:#FFF;
+}
+</style>
+<script>
+
+var status="";
+var query="";
+var url_string = window.location.href;
+try{
+ 
+ // var url = new URL(url_string);
+   //var property_id = url.searchParams.get("id");
+var property_id=url_string.split("=")[1];
+}
+catch(e){alert("Exception occurs");}
+
+$(document).ready(function(){
+
+/// rating////////////////////////////
+ $(".rating input:radio").attr("checked", false);
+
+    $('.rating input').click(function () {
+        $(".rating span").removeClass('checked');
+        $(this).parent().addClass('checked');
+    });
+
+    $('input:radio').change(
+      function(){
+        var userRating = this.value;
+        $.ajax({
+         type:'post',
+               url:"{% url 'rating' %}",
+               data:{'rating':userRating,'p_id':property_id},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.resp && data.resp.length>0) {$('#resp').text(data.resp);}
+        		else{$('#resp').text('');}		}
+
+        });
+    });
+
+////////////////////////////////////////
+
+
+function check(){
+    query=$('#query').val();
+    if(query.length==0){status+="error";$('#err').text("Please enter some message for client");}
+    if(query.length==0){status+="error";$('#err').text("Please enter some message for client");}
+    return status;
+}
+
+
+$('#query').blur(function(e){
+
+if($(this).val().length==0){$('#err').text("Please enter some message for client");}
+else{$('#err').text("");}
+});
+
+$('#feedback').click(function(e){
+    e.preventDefault();
+
+   st=check();
+
+    if(st.length==0){
+    $('#resp').text('Please wait...');
+    $('#err').text('');
+    $.ajax({
+               type:'post',
+               url:"{% url 'feedback' %}",
+               data:{'feedback':query,'property_id':property_id},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.resp && data.resp.length>0) {$('#resp').text(data.resp);}
+        		else{$('#resp').text('');}		}
+
+
+                         });
+
+    }
+    else{$('#err').text('Please fill the field...');}
+
+});
+$('#email').click(function(e){
+    e.preventDefault();
+
+    $('#resp').text('Please wait while sending email...');
+    $('#err').text('');
+    $.ajax({
+               type:'post',
+               url:"{% url 'send_email' %}",
+               data:{'id':property_id},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.resp && data.resp.length>0) {$('#resp').text(data.resp);}
+        		else{$('#resp').text('');}		}
+
+
+                         });
+
+
+
+});
+
+
+$('#saved_p').click(function(e){
+    e.preventDefault();
+
+
+    $('#err').text('');
+    $.ajax({
+               type:'post',
+               url:"{% url 'p_saved' %}",
+               data:{'id':property_id},
+               dataType:'json',
+               success: function (data,err) {
+               console.log(data);
+                  if (data.type==1) {$('#resp').text(data.resp);}
+        		else{$('#resp').text('Property saving opertion failure');}		}
+
+
+                         });
+
+
+
+});
+
+$('#mobile').click(function(e){
+    e.preventDefault();
+
+    $('#resp').text('Please wait while sending sms...');
+    $('#err').text('');
+    $.ajax({
+                  type:'post',
+               url:"{% url 'sent_sms' %}",
+               data:{'id':property_id},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.resp && data.resp.length>0) {$('#resp').text(data.resp);}
+        		else{$('#resp').text('');}		}
+
+
+
+                         });
+                         });
+
+
+ //$(document.body).on('click','payment_r',function(e){
+$('#payment_r').click(function(e){    
+e.preventDefault();
+
+
+    $('#err').text('');
+    $.ajax({
+                  type:'post',
+               url:"{% url 'pay_req' %}",
+               data:{'id':property_id},
+               dataType:'json',
+               success: function (data,err) {
+                  if (data.resp && data.resp.length>0) {$('#resp').text(data.resp);}
+        		else{$('#resp').text('');}		}
+
+                         });
+                         });
+
+
+});
+
+
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / {{p_category}}</span>
+    <h2>{{p_category}}</h2>
+</div>
+</div>
+<!-- banner -->
+
+
+<div class="container">
+    {% block content %}
+<div class="properties-listing spacer">
+ {% ifequal result 1 %}
+<div class="row">
+<div class="col-lg-3 col-sm-4 hidden-xs">
+
+<div class="hot-properties hidden-xs">
+<h4>Suggest Properties</h4>
+
+    {% for item in latest %}
+    <div class="row">
+                <div class="col-lg-4 col-sm-5"><img src="{% static 'property/' %}{{item.img}}" class="img-responsive img-circle" alt="properties"/></div>
+                <div class="col-lg-8 col-sm-7">
+                  <h5><a href="{% url 'property-detail' %}?id={{item.id}}">{{item.name}}</a></h5>
+                  <p class="price">{{item.price}}</p> </div>
+              </div>
+{% endfor %}
+
+</div>
+
+
+
+<div class="advertisement">
+
+    <h4>Feedback</h4>
+    {% ifequal flag 1 %}
+  {% for item in feedback %}
+    <div>
+        <h4><b>{{item.user}}</b></h4>
+        <p>{{item.feed}}</p>
+        <p>{{item.date}}</p>
+    </div>
+    {% endfor %}
+    {% endifequal %}
+    {% ifequal flag 0%}
+
+
+    {% for item in feedback %}
+    <p><b>{{item}}</b></p>
+
+    {% endfor %}
+    {% endifequal %}
+
+</div>
+
+</div>
+
+<div class="col-lg-9 col-sm-8 ">
+
+
+<h2>{{property_name}}</h2>
+<div class="row">
+  <div class="col-lg-8">
+  <div class="property-images">
+    <!-- Slider Starts -->
+<div id="myCarousel" class="carousel slide" data-ride="carousel">
+      <!-- Indicators -->
+      <ol class="carousel-indicators hidden-xs">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1" class=""></li>
+        <li data-target="#myCarousel" data-slide-to="2" class=""></li>
+        <li data-target="#myCarousel" data-slide-to="3" class=""></li>
+      </ol>
+      <div class="carousel-inner">
+        <!-- Item 1 -->
+        {% block images %}
+          {% for img in media %}
+          <div class="item active">
+          <img src="{% static 'property/' %}{{img}}" class="properties" alt="properties" />
+        </div>
+          {% endfor %}
+        <!-- #Item 1 -->
+    {% endblock %}
+
+        <!-- # Item 4 -->
+      </div>
+      <a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+      <a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+    </div>
+<!-- #Slider Ends -->
+
+  </div>
+  
+
+
+    <div class="spacer"><h4><span class="glyphicon glyphicon-th-list"></span> Property Video</h4>
+  <video width="555px" height="240px"  style="background-color:black;" controls src="{{MEDIA_URL}}property/{{video}}"></video>
+
+
+  </div>
+
+  <div class="spacer"><h4><span class="glyphicon glyphicon-th-list"></span> Properties Detail</h4>
+  <p>{{desc}}</p>
+
+
+  </div>
+  <div><h4><span class="glyphicon glyphicon-map-marker"></span> Location</h4>
+<div class="well">
+    <iframe width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCYyZC-QP1YWyLFEJkUBNzHQ2NqEvsvGlI&q={{address}}" allowfullscreen></iframe>
+
+    </div>
+  </div>
+
+
+
+      <p style="font-size:16px;color:red;">{{error}}</p>
+
+  </div>
+  <div class="col-lg-4">
+  <div class="col-lg-12  col-sm-6">
+<div class="property-info">
+<p class="price">{{price}}</p>
+  <p class="area"><span class="glyphicon glyphicon-map-marker"></span>{{address}}, {{city}}</p>
+  
+  <div class="profile">
+  <span class="glyphicon glyphicon-user"></span> Agent Details
+  <p>{{username}}<br>{{phone}}</p>
+  </div>
+</div>
+
+    <h6><span class="glyphicon glyphicon-home"></span> Availabilty</h6>
+    <div class="listing-detail">
+    <span data-toggle="tooltip" data-placement="bottom" data-original-title="Bed Room">{{bed}}</span>
+        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Living Room">{{living}}</span>
+        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Parking">{{park}}</span>
+        <span data-toggle="tooltip" data-placement="bottom" data-original-title="Kitchen">{{kitchen}}</span> </div>
+
+</div>
+
+      <h3><b>Rating</b></h3>
+      <p>{{rang}}</p>
+      <div class="rating">
+            <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
+                <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
+                <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
+                <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
+                <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
+        </div>
+
+
+
+
+<div class="col-lg-12 col-sm-6 ">
+<div class="enquiry">
+  <h6><span class="glyphicon glyphicon-envelope"></span> Post Enquiry</h6>
+
+
+                <textarea rows="6"  id="query" class="form-control" placeholder="Whats on your feedback?"></textarea>
+    <button id="feedback" class="btn btn-primary">Send it!</button>
+    <br><br>
+      <button id="mobile" class="btn btn-primary">Send SMS</button>
+      <br><br>
+      <button id="email" class="btn btn-primary">Send Email</button>
+        <br><br>
+      <button id="saved_p" class="btn btn-primary">Wish List</button>
+      <br><br>
+
+{% ifequal stat 0 %}
+    <button id="payment_r" class="btn btn-primary">Payment Request</button>
+      <br>
+{% endifequal %}
+      <p id="err" style="color:red;"></p><p id="resp" style="color:green;"></p>
+
+ </div>         
+</div>
+  </div>
+</div>
+    {% endifequal %}
+
+</div>
+</div>
+</div>
+     {% ifequal result 0 %}
+      <p style="color:red;text-align:center;">No data found</p>
+      {% endifequal %}
+    {% endblock %}
+
+</div>
+
+{% include 'footer.html' %}

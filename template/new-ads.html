@@ -1,0 +1,154 @@
+{% include 'header.html' %}
+<!-- banner -->
+<script xmlns="http://www.w3.org/1999/html">
+    $(document).ready(function(){
+        $('#email').blur(function(e){
+         var username=$(this).val();
+         e.preventDefault();
+        if(username.length==0){$('#user').text("Please fill this field");}
+            else{$('#user').text("");}
+              $.ajax({
+               type:'post',
+               url:"{% url 'checkLoginUsername' %}",
+               data:{'user':username},
+               dataType:'json',
+               success: function (data) {
+                  if (data.is_taken && data.is_taken.length>0) {$('#user').val('');$('#user').text(data.is_taken);}
+        		else{$('#user').empty();}		}
+                         });
+
+        });
+
+
+    $('#pass').blur(function(e){
+    var password=$(this).val();
+         e.preventDefault();
+        if(password.length==0){$('#password').text("Please fill this password field");}
+            else{$('#password').text("");}
+
+    });
+
+     $('#login').submit(function(e){
+
+     var user=$('#email').val();
+     var password=$('#pass').val();
+     if(user.length==0 || password.length==0){e.preventDefault();$('#error').text("Not submit due to not filling fields");}
+     else{$('#error').text("");}
+     });
+
+    });
+</script>
+<div class="inside-banner">
+  <div class="container"> 
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Ads Registration</span>
+    <h2>Ads Registration</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 ">
+<p style="color:blue;font-size:20px;margin-top:-50px;">{{success}}</p>
+      {% block content %}
+      {% ifequal logvalue 1 %}
+      <form action="{% url 'middle_registration' %}" method="post">
+    {% csrf_token %}
+                <input type="text" class="form-control" id="p_name" placeholder="Enter Property's Name" name="p_name" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="error_pname"></p>
+
+          <textarea rows="5" class="form-control" name="p_detail" placeholder="Property's Detail"></textarea>
+           <p style="color:red;font-bold:true;font-size:16px;" id="error_pdetail"></p>
+              <input type="text" class="form-control" id="p_address" placeholder="Property's Address" name="p_address" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="error_paddress"></p>
+          <select class="form-control" name="p_city" style="height:50px;">
+              <option>City</option>
+              <option>Gujranwala</option>
+              <option>Lahore</option>
+              <option>Faisalabad</option>
+          </select>
+          <input type="number" class="form-control" id="p_price" placeholder="Property's Price" name="p_price" />
+ <p style="color:red;font-bold:true;font-size:16px;" id="error_pprice"></p>
+          <div style="width:555px;">
+          <select class="form-control" style="width:260px;float:left;height:50px;" name="p_category">
+              <option>Category</option>
+              <option>Rent</option>
+              <option>Sale</option>
+          </select>
+          <select class="form-control" style="width:260px;float:left;margin-left:30px;height:50px;" name="p_type">
+              <option>Type</option>
+              <option>Appartment</option>
+              <option>Flat</option>
+              <option>House</option>
+          </select>
+              </div>
+
+
+
+          <div style="width:555px;">
+              <select class="form-control" name="broom" style="width:135px;height:50px;float:left;">
+                  <option>Bed Rooms</option>
+                  {% for elem in number %}
+                  <option>{{elem}}</option>
+                  {% endfor %}
+              </select>
+
+              <select class="form-control" name="lroom" style="height:50px;width:135px;float:left;margin-left:3px;">
+                  <option>Living Rooms</option>
+                  {% for elem in number %}
+                  <option>{{elem}}</option>
+                  {% endfor %}
+              </select>
+
+              <select class="form-control" name="parking" style="width:135px;height:50px;float:left;margin-left:3px;">
+                  <option>Parking</option>
+                  {% for elem in number %}
+                  <option>{{elem}}</option>
+                  {% endfor %}
+              </select>
+
+              <select class="form-control" name="kitchen" style="width:135px;height:50px;float:left;margin-left:4px;">
+                  <option>Kitchen</option>
+                  {% for elem in number %}
+                  <option>{{elem}}</option>
+                  {% endfor %}
+              </select>
+          </div>
+<div>
+<input type="number" name="p_area" placeholder="Enter Area value" style="width:390px;float:left;" class="form-control"/>
+<select name="p_areacategory" class="form-control" style="width:150px;float:left;height:50px;margin-left:5px;">
+    <option>Area</option>
+    <option>Marla</option>
+    <option>Canal</option>
+    <option>Acre</option>
+    <option>Square feet</option>
+</select>
+</div>
+
+
+
+          <br/><br/>
+      <input type="submit" id="btn" class="btn btn-success" value="Submit" />
+
+</form>
+
+      <br>
+      <p style="color:blue;font-size:17px;margin-left:150px;">1 of 2 submission of ads registration</p>
+<br/>
+      {% endifequal %}
+{% endblock %}
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

@@ -1,0 +1,345 @@
+<!doctype html>
+<html>
+{% load staticfiles %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0">
+    <style>
+        body {width: 100%;}
+        canvas {display: none;}
+    </style>
+    <script src="{% static 'js/gumadapter.js'%}"></script>
+    <script src="https://www.webrtc-experiment.com/RTCPeerConnection-v1.5.js"></script>
+    <script>
+var socket = io.connect('http://127.0.0.1:8299/');
+socket.on('message', function(data) {
+    if(data.offerSDP)  {}
+    if(data.answerSDP) {}
+    if(data.candidate) {}
+
+    var sdpConstraints = {
+    optional: [],
+    mandatory: {
+        OfferToReceiveAudio: true,
+        OfferToReceiveVideo: true
+    }
+};
+
+// for Firefox:
+var sdpConstraints = {
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true
+};
+
+});
+socket.send = function(data) {
+    socket.emit('message', data);
+};
+
+
+
+
+
+// Now you can send "any-kind" of data like this:
+socket.send('string');
+socket.send([array]);
+socket.send({
+    targetUser: 'target-user-id',
+    sdp       : 'offerSDP || answerSDP'
+});
+
+        navigator.getUserMedia = navigator.getUserMedia ||
+                         navigator.webkitGetUserMedia ||
+                         navigator.mozGetUserMedia;
+
+if (navigator.getUserMedia) {
+   navigator.getUserMedia({ audio: true, video: { width: 1280, height: 720 } },
+      function(stream) {
+         var video = document.querySelector('video');
+         video.srcObject = stream;
+         video.onloadedmetadata = function(e) {
+           video.play();
+         };
+      },
+      function(err) {
+         console.log("The following error occurred: " + err.name);
+      }
+   );
+} else {
+   console.log("getUserMedia not supported");
+}
+
+var configuration = {
+    attachStream: MediaStream,
+    attachStreams: [MediaStream_1, MediaStream_2, MediaStream_3],
+
+    offerSDP: offerSDP_sent_from_offerer,
+
+    onICE: function (candidate) {},
+    onRemoteStream: function (stream) {},
+    onRemoteStreamEnded: function (stream) {},
+
+    onOfferSDP: function (offerSDP) {},
+    onAnswerSDP: function (answerSDP) {},
+
+    onChannelMessage: function (event) {},
+    onChannelOpened: function (_RTCDataChannel) {}
+};
+
+
+var connection = new [webkit|moz]  RTCPeerConnection(
+    'ice-servers',
+    'optional-arguments'
+);
+
+connection.createOffer(getOfferSDP, onfailure, sdpConstraints);
+function getOfferSDP(offerSDP) {
+    connection.setLocalDescription(offerSDP [, successCallback, failureCallback]);
+
+    console.log('offer sdp', offerSDP.sdp);
+    console.log('type',      offerSDP.type);
+};
+
+
+
+
+var connection = new [webkit|moz] RTCPeerConnection(
+    'ice-servers',
+    'optional-arguments'
+);
+
+// "setRemoteDescription" is quickly called for answerer
+var remoteSessionDescription = new RTCSessionDescription(offerSDP);
+connection.setRemoteDescription(remoteSessionDescription, successCallback, failureCallback);
+
+connection.createAnswer(getAnswerSDP, onfailure, sdpConstraints);
+function getAnswerSDP(answerSDP) {
+    connection.setLocalDescription(answerSDP);
+
+    console.log('answer sdp', answerSDP.sdp);
+    console.log('type',       answerSDP.type);
+};
+
+
+var remoteSessionDescription = new RTCSessionDescription(answerSDP);
+connection.setRemoteDescription(remoteSessionDescription, successCallback, failureCallback);
+
+
+var STUN = {
+    urls: 'stun:stun.l.google.com:19302'
+};
+
+var TURN = {
+    urls: 'turn:turn.bistri.com:80',
+    credential: 'homeo',
+    username: 'homeo'
+};
+
+var iceServers = {
+   iceServers: [STUN, TURN]
+};
+
+// DTLS/SRTP is preferred on chrome
+// to interop with Firefox
+// which supports them by default
+
+var DtlsSrtpKeyAgreement = {
+   DtlsSrtpKeyAgreement: true
+};
+
+var optional = {
+   optional: [DtlsSrtpKeyAgreement]
+};
+///////////////////////////////OFFERING TO OTHER PEER///////////////////////////////////////////////////////
+
+var button = document.getElementById('start-peer-connection');
+button.onclick = function() {
+    this.disabled = true;
+
+    // it is suggested to use gumadapter.js instead:
+    // https://github.com/muaz-khan/gumadapter
+    navigator.webkitGetUserMedia(MediaConstraints, OnMediaSuccess, OnMediaError);
+    var MediaConstraints = {
+        audio: true,
+        video: true
+    };
+
+    function OnMediaError(error) {
+        console.error(error);
+    }
+
+    function OnMediaSuccess(mediaStream) {
+        var peer = new [webkit|moz]RTCPeerConnection(iceServers, optional);
+
+        peer.addStream(mediaStream);
+
+        peer.onaddstream = function(mediaStream) {
+            video.src = webkitURL.createObjectURL(mediaStream);
+        };
+
+        peer.onicecandidate = function(event) {
+            var candidate = event.candidate;
+            if(candidate) {
+                socket.send({
+                    targetUser: 'target-user-id',
+                    candidate: candidate
+                });
+            }
+        };
+
+        peer.createOffer(function(offerSDP) {
+            peer.setLocalDescription(offerSDP, successCallback, failureCallback);
+            socket.send({
+                targetUser: 'target-user-id',
+                offerSDP: offerSDP
+            });
+        }, onfailure, sdpConstraints);
+    }
+};
+
+var STUN = {
+    urls: 'stun:stun.l.google.com:19302'
+};
+
+var TURN = {
+    urls: 'turn:turn.bistri.com:80',
+    credential: 'homeo',
+    username: 'homeo'
+};
+
+var iceServers = {
+   iceServers: [STUN, TURN]
+};
+
+// DTLS/SRTP is preferred on chrome
+// to interop with Firefox
+// which supports them by default
+
+var DtlsSrtpKeyAgreement = {
+   DtlsSrtpKeyAgreement: true
+};
+
+var optional = {
+   optional: [DtlsSrtpKeyAgreement]
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+////////////////////////////////////ANSWERING CALL/////////////////////////////////////////////////////////////////////////////
+socket.onmessage =  function(e) {
+    var data = e.data;
+    if(data.targetUser !== self && data.offerSDP) {
+        createAnswer(offerSDP);
+    }
+};
+function createAnswer(offerSDP) {
+    // it is suggested to use gumadapter.js instead:
+    // https://github.com/muaz-khan/gumadapter
+    navigator.webkitGetUserMedia(MediaConstraints, OnMediaSuccess, OnMediaError);
+    var MediaConstraints = {
+        audio: true,
+        video: true
+    };
+
+    function OnMediaError(error) {
+        console.error(error);
+    }
+
+    function OnMediaSuccess(mediaStream) {
+        var peer = new [webkit|moz]RTCPeerConnection(iceServers, optional);
+
+        peer.addStream(mediaStream);
+
+        peer.onaddstream = function(mediaStream) {
+            video.src = webkitURL.createObjectURL(mediaStream);
+        };
+
+        peer.onicecandidate = function(event) {
+            var candidate = event.candidate;
+            if(candidate) {
+                socket.send({
+                    targetUser: 'target-user-id',
+                    candidate: candidate
+                });
+            }
+        };
+
+        // remote-descriptions should be set earlier
+        // using offer-sdp provided by the offerer
+        var remoteDescription = new RTCSessionDescription(offerSDP);
+        peer.setRemoteDescription(remoteDescription, successCallback, failureCallback);
+
+        peer.createAnswer(function(answerSDP) {
+            peer.setLocalDescription(answerSDP, successCallback, failureCallback);
+            socket.send({
+                targetUser: 'target-user-id',
+                answerSDP: answerSDP
+            });
+        }, onfailure, sdpConstraints);
+    }
+    socket.onmessage =  function(e) {
+    var data = e.data;
+    if(data.targetUser !== self && data.answerSDP) {
+        // completing the handshake; this code is for offerer
+        var remoteDescription = new RTCSessionDescription(answerSDP);
+        peer.setRemoteDescription(remoteDescription, successCallback, failureCallback);
+    }
+};
+
+socket.onmessage =  function(e) {
+    var data = e.data;
+    if(data.targetUser !== self && data.candidate) {
+        var candidate     = data.candidate.candidate;
+        var sdpMLineIndex = data.candidate.sdpMLineIndex;
+
+        peer.addIceCandidate(new [moz]RTCIceCandidate({
+            sdpMLineIndex: sdpMLineIndex,
+            candidate    : candidate
+        }), successCallback, failureCallback);
+    }
+};
+
+
+
+peer.onicecandidate =  function(e) {
+    var candidate = e.candidate;
+    // typeof candidate == 'undefined'
+    // !candidate -or- !!candidate == false
+
+    if(typeof candidate == 'undefined') {
+        send_SDP();
+    }
+};
+
+peer.ongatheringchange =  function(e) {
+    if (e.currentTarget &&
+        e.currentTarget.iceGatheringState === 'complete') {
+        send_SDP();
+    }
+};
+
+function send_SDP() {
+    socket.send({
+        targetUser: 'target-user-id',
+        sdp       :  peer.localDescription
+    });
+}
+
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    </script>
+</head>
+<body>
+    <video  id="video" width="300" height="320" autoplay> </video>
+    <p id="error">Click on the video to send a snapshot to the receiving screen</p>
+<button id="peer">Start it</button>
+    <canvas id="canvas" width="240" height="320"> </canvas>
+	
+</body>
+</html>

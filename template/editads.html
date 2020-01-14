@@ -1,0 +1,262 @@
+{% include 'header.html' %}
+<!-- banner -->
+{% load staticfiles %}
+<style>
+    .event{
+    color:white;
+    }
+    .p_id{
+    margin-top:-30px;
+    }
+    .bk{
+    margin-top:-50px;
+    }
+
+</style>
+<script>
+$(document).ready(function(){
+
+  var url_string = window.location.href;
+        var url = new URL(url_string);
+        var p_id = url.searchParams.get("id");
+
+$("#p_name").blur(function(e){
+e.preventDefault();
+var title=$(this).val();
+if(title.length==0){$('#error_pname').text("Please fill above title field");}
+else{$('#error_pname').text("");}
+});
+
+$("#p_detail").blur(function(e){
+e.preventDefault();
+var desc=$(this).val();
+if(desc.length==0){$('#error_pdetail').text("Please fill above description field");}
+else{$('#error_pdetail').text("");}
+});
+
+
+
+$("#p_address").blur(function(e){
+e.preventDefault();
+var address=$(this).val();
+if(address.length==0){$('#error_paddress').text("Please fill above address field");}
+else{$('#error_paddress').text("");}
+});
+
+
+$("#p_city").change(function(e){
+    e.preventDefault();
+    var city=$(this).val();
+    if(city=="City"){$('#error_pcity').text("Please select above city field");}
+    else{$('#error_pcity').text("");}
+});
+
+
+$("#p_price").blur(function(e){
+    e.preventDefault();
+    var price=$(this).val();
+    if(price.length==0){$('#error_pprice').text("Please fill above price field");}
+    else{$('#error_pprice').text("");}
+});
+
+
+$("#p_category").change(function(e){
+    e.preventDefault();
+    var category=$(this).val();
+    if(category=="Category"){$('#error_pcategory').text("Please select above category field");}
+    else{$('#error_pcategory').text("");}
+});
+
+
+$("#p_type").change(
+function(e){
+    e.preventDefault();
+    var category=$(this).val();
+    if(category=="Type"){$('#error_ptype').text("Please select above type field");}
+    else{$('#error_ptype').text("");}
+});
+
+
+$("#p_bed").change();
+$("#p_living").change();
+$("#p_parking").change();
+$("#p_kitchen").change();
+
+
+
+$("#p_area").blur(
+function(e){
+    e.preventDefault();
+    var category=$(this).val();
+    if(category==""){$('#error_parea').text("Please fill above area field");}
+    else{$('#error_parea').text("");}
+});
+
+
+$("#p_area2").change(function(e){
+    e.preventDefault();
+    var category=$(this).val();
+    if(category=="Area"){$('#error_parea').text("Please select above area scale field");}
+    else{$('#error_parea').text("");}
+});
+
+$('#editads').on('submit',function(e){
+    e.preventDefault();
+    $.ajax({
+         type:'post',
+               url:"{% url 'submit_editads' %}",
+               data:{
+                        'title':$('#p_name').val(),
+                        'desc':$('#p_detail').val(),
+                        'address':$('#p_address').val(),
+                        'city':$('#p_city').val(),
+                        'price':$('#p_price').val(),
+                        'category':$('#p_category').val(),
+                        'type':$('#p_type').val(),
+                        'bed':$('#p_bed').val(),
+                        'living':$('#p_living').val(),
+                        'parking':$('#p_parking').val(),
+                        'kitchen':$('#p_kitchen').val(),
+                        'area':$('#p_area').val()+$('#p_area2').val(),
+                        'p_id':p_id
+                        },
+               dataType:'json',
+               success: function (data) {
+
+               if(data.type==1){
+                    $('#result').text("Your ad has been changed successfully.");
+               }
+                  $('#result').text(data.resp);
+                  	}
+    });
+
+});
+
+});
+</script>
+<div class="inside-banner">
+  <div class="container">
+    <span class="pull-right"><a href="{% url 'home' %}">Home</a> / Ads Editing</span>
+    <h2>Ads Editing</h2>
+</div>
+</div>
+<!-- banner -->
+
+<br/>
+<br/><br/>
+<br/>
+<div class="container">
+<div class="spacer">
+<div class="row register">
+
+  <div class="col-lg-6 col-lg-offset-3 col-sm-6 col-sm-offset-3 col-xs-12 " style="float:left;">
+
+{% block content %}
+      {% ifequal res 1 %}
+  <form id="editads" action="" method="post">
+    {% csrf_token %}
+                <input type="text" class="form-control" id="p_name" placeholder="Enter Property's Name" value="{{resp.name}}"name="p_name" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="error_pname"></p>
+
+          <textarea rows="5" class="form-control" id="p_detail"  name="p_detail" placeholder="Property's Detail">{{resp.desc}}</textarea>
+           <p style="color:red;font-bold:true;font-size:16px;" id="error_pdetail"></p>
+              <input type="text" class="form-control" id="p_address" value="{{resp.address}}" placeholder="Property's Address" name="p_address" />
+  <p style="color:red;font-bold:true;font-size:16px;" id="error_paddress"></p>
+          <select class="form-control" name="p_city" id="p_city"  style="height:50px;">
+              <option>City</option>
+              <option>Gujranwala</option>
+              <option>Lahore</option>
+              <option>Faisalabad</option>
+          </select>
+      <p style="color:red;font-bold:true;font-size:16px;" id="error_pcity"></p>
+          <input type="number" class="form-control" id="p_price" value="{{resp.price}}" placeholder="Property's Price" name="p_price" />
+ <p style="color:red;font-bold:true;font-size:16px;" id="error_pprice"></p>
+          <div style="width:555px;">
+          <select class="form-control" id="p_category" onloadeddata="{{resp.category}}" style="width:260px;float:left;height:50px;" name="p_category">
+              <option>Category</option>
+              <option {% if resp.category == 0 %}selected="selected"{% endif %}>Buy</option>
+              <option {% if resp.category == 1 %}selected="selected"{% endif %}>Rent</option>
+              <option {% if resp.category == 2 %}selected="selected"{% endif %}>Sale</option>
+
+          </select>
+
+          <select class="form-control" id="p_type" style="width:260px;float:left;margin-left:30px;height:50px;" name="p_type">
+              <option>Type</option>
+              <option {% if resp.type == 0 %}selected="selected"{% endif %} >Appartment</option>
+              <option {% if resp.type == 1 %}selected="selected"{% endif %} >Flat</option>
+              <option  {% if resp.type == 2 %}selected="selected"{% endif %} >House</option>
+              <option {% if resp.type == 3 %}selected="selected"{% endif %} >Office</option>
+
+          </select>
+ <p style="color:red;font-bold:true;font-size:16px;" id="error_pcategory"></p>
+  <p style="color:red;font-bold:true;font-size:16px;" id="error_ptype"></p>
+              </div>
+
+
+
+          <div style="width:555px;">
+              <select class="form-control" id="p_bed" name="broom" style="width:135px;height:50px;float:left;">
+                  <option>Bed Rooms</option>
+                  {% for elem in number %}
+                  <option {% if elem == resp.bed %}selected="selected"{% endif %}>{{elem}}</option>
+                  {% endfor %}
+              </select>
+
+              <select class="form-control" id="p_living" name="lroom" style="height:50px;width:135px;float:left;margin-left:3px;">
+                  <option>Living Rooms</option>
+                   {% for elem in number %}
+                  <option {% if elem == resp.living %}selected="selected"{% endif %}>{{elem}}</option>
+                  {% endfor %}
+              </select>
+
+              <select class="form-control" id="p_parking" name="parking" style="width:135px;height:50px;float:left;margin-left:3px;">
+                  <option>Parking</option>
+                   {% for elem in number %}
+                  <option {% if elem == resp.parking %}selected="selected"{% endif %}>{{elem}}</option>
+                  {% endfor %}
+              </select>
+
+              <select class="form-control"  id="p_kitchen" name="kitchen" style="width:135px;height:50px;float:left;margin-left:4px;">
+                  <option>Kitchen</option>
+                    {% for elem in number %}
+                  <option {% if elem == resp.kitchen %}selected="selected"{% endif %}>{{elem}}</option>
+                  {% endfor %}
+              </select>
+          </div>
+<div>
+<input type="number" name="p_area"  id="p_area" placeholder="Enter Area value" value="{{resp.area}}" style="width:390px;float:left;" class="form-control"/>
+<select name="p_areacategory" id="p_area2" class="form-control" style="width:150px;float:left;height:50px;margin-left:5px;">
+    <option>Area</option>
+    <option {% if resp.area2 == 0 %}selected="selected"{% endif %}>Marla</option>
+    <option {% if resp.area2 == 1 %}selected="selected"{% endif %}>Canal</option>
+    <option {% if resp.area2 == 2 %}selected="selected"{% endif %}>Acre</option>
+    <option {% if resp.area2 == 3 %}selected="selected"{% endif %}>Square feet</option>
+</select>
+    <p style="color:red;font-bold:true;font-size:16px;" id="error_parea"></p>
+</div>
+
+
+
+          <br/><br/>
+      <input type="submit" id="btn" class="btn btn-success" value="Change" />
+
+</form>
+<b><p id="result" ></p></b>
+      {% endifequal %}
+
+      {% ifequal res 0 %}
+      <h3>No data found that you require according to property...</h3>
+      {% endifequal%}
+
+      {% endblock %}
+        </div>
+
+
+</div>
+</div>
+    <p style="color:red;font-size:16px;margin-top:20px; margin-left:440px;" id="error"></p>
+    <p style="color:red;font-size:16px;margin-top:30px; margin-left:440px;">{{error}}</p>
+</div>
+<br/><br/>
+<br/>
+{% include 'footer.html' %}

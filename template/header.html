@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+<head>
+<title>BookIt.com </title>
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+ 	<link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/style.css' %}"/>
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+
+	<script src="{% static 'assets/bootstrap/js/bootstrap.js' %}"></script>
+  <script src="{% static 'assets/script.js' %}"></script>
+<script src="{% static 'js/jquery.scrollIntoView.min.js' %}"></script>
+
+
+<!-- Owl stylesheet -->
+<link rel="stylesheet" href="{% static 'assets/owl-carousel/owl.carousel.css' %}">
+<link rel="stylesheet" href="{% static 'assets/owl-carousel/owl.theme.css' %}">
+<script src="{% static 'assets/owl-carousel/owl.carousel.js' %}"></script>
+<!-- Owl stylesheet -->
+
+
+<!-- slitslider -->
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/slitslider/css/style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/slitslider/css/custom.css' %}" />
+    <script type="text/javascript" src="{% static 'assets/slitslider/js/modernizr.custom.79639.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/slitslider/js/jquery.ba-cond.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/slitslider/js/jquery.slitslider.js' %}"></script>
+<!-- slitslider -->
+
+</head>
+
+<body>
+
+{% block cont %}
+
+{% ifequal error_bit 1 %}
+<p style="color:red;"><b>{{error}}</b></p>
+{% endifequal %}
+
+
+{% ifequal logvalue 1 %}
+    {% ifequal status 0 %}
+<div style="height:30px;"><p style="font-size:16px;margin-top:2px;color:green;">Please verify your account to access to feature <a href="{% url 'verify' %}">Click to verify</a></p></div>
+    {% endifequal %}
+{% endifequal %}
+{% endblock %}
+<!-- Header Starts -->
+<div class="navbar-wrapper">
+
+        <div class="navbar-inverse" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+
+
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+            </div>
+
+
+            <!-- Nav Starts -->
+            <div class="navbar-collapse  collapse">
+                {% block content %}
+              <ul class="nav navbar-nav navbar-right">
+               <li><a href="{% url 'home' %}">Home</a></li>
+                  {% ifequal logvalue 1 %}
+                 <li><a href="{% url 'new-ads' %}">New Ads</a></li>
+                  <li><a href="{% url 'notification' %}">Notification</a></li>
+                    <li><a href="{% url 'chat' %}">Messages</a></li>
+                  {% endifequal %}
+                  <li><a href="{% url 'about' %}">About</a></li>
+                <li><a href="{% url 'agents' %}">Developers</a></li>
+
+                <li><a href="{% url 'contact' %}">Contact</a></li>
+
+                  {% ifequal logvalue 0%}
+                  <li><a href="{% url 'login' %}">Login</a></li>
+                  {% endifequal %}
+
+                  {% ifequal logvalue 1%}
+                  <li>
+                  <div class="dropdown">
+						        <a type="button" class="btn dropdown-toggle" style="color:gray;text-transform:uppercase;font-size:12px;margin-top:3px;" data-toggle="dropdown">
+							            {{fname}} <span class="caret"></span>
+						        </a>
+					        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'saved' %}" >Wish List</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'payment' %}" >Payment Method</a></li>
+                                {% ifequal status 0 %}
+						        <li role="presentation"><a role="menuitem" tabindex="-1" href="" style="pointer-events:none;cursor:default;">Settings</a></li>
+                                {% endifequal %}
+                                   {% ifequal status 1 %}
+						        <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'settings' %}" >Settings</a></li>
+                                {% endifequal %}
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="{% url 'logout' %}">Logout</a></li>
+                                </ul>
+                      </div>
+
+
+
+                  </li>
+                  {% endifequal %}
+                  {% endblock %}
+              </ul>
+            </div>
+            <!-- #Nav Ends -->
+
+          </div>
+        </div>
+
+    </div>
+<!-- #Header Starts -->
+
+
+
+
+
+<div class="container">
+
+<!-- Header Starts -->
+<div class="header">
+<a href="{% url 'home' %}"><img src="{% static 'images/logo4.png' %}" alt="Realestate"></a>
+
+              <ul class="pull-right">
+                <li><a href="{% url 'query-search' %}?req=Buy">Buy</a></li>
+                <li><a href="{% url 'query-search' %}?req=Sale">Sale</a></li>
+                <li><a href="{% url 'query-search' %}?req=Rent">Rent</a></li>
+              </ul>
+</div>
+<!-- #Header Starts -->
+</div>
